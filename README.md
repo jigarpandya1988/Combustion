@@ -12,3 +12,11 @@ To request special access or a commercial license, contact:
 
 ⚠️ **Disclaimer:** This software is not certified for use in industrial control, automation, or safety-critical systems. Use at your own risk.
 
+## 🚀 Installation
+
+Clone the repo and install dependencies:
+
+```bash
+git clone https://github.com/jigarpandya1988/Combustion.git
+cd Combustion
+pip install -r requirements.txt
