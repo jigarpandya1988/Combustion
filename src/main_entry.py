@@ -18,12 +18,11 @@ Assumptions:
 - Required Python >= 3.9
 """
 
-
+import asyncio
 import json
 import logging
 import multiprocessing
 import os
-import asyncio
 
 from plc.rockwell.logix import PLCCommunication
 from sqlitex.sqlite_logger import SQLiteLogger
@@ -32,15 +31,12 @@ from utils.json_utils.json_logger import JSONLogger
 
 
 def setup_logging(config):
-    level = getattr(logging, config['level'].upper(), logging.INFO)
-    os.makedirs(os.path.dirname(config['file']), exist_ok=True)
+    level = getattr(logging, config["level"].upper(), logging.INFO)
+    os.makedirs(os.path.dirname(config["file"]), exist_ok=True)
     logging.basicConfig(
         level=level,
-        format='%(asctime)s [%(levelname)s] %(message)s',
-        handlers=[
-            logging.FileHandler(config['file']),
-            logging.StreamHandler()
-        ]
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[logging.FileHandler(config["file"]), logging.StreamHandler()],
     )
 
 
@@ -48,17 +44,17 @@ def plc_worker(plc_config: dict):
     """
     Process-safe PLC polling worker. Sets up communication and loggers.
     """
-    ip = plc_config['ip']
-    tags = plc_config['tags']
-    poll_interval = plc_config.get('poll_interval', 1.0)
+    ip = plc_config["ip"]
+    tags = plc_config["tags"]
+    poll_interval = plc_config.get("poll_interval", 1.0)
 
-    logger = SQLiteLogger(plc_config['sqlite_path'])
-    json_logger = JSONLogger(plc_config['json_path'])
-    csv_exporter = CSVExporter(plc_config['sqlite_path'])
+    logger = SQLiteLogger(plc_config["sqlite_path"])
+    json_logger = JSONLogger(plc_config["json_path"])
+    csv_exporter = CSVExporter(plc_config["sqlite_path"])
 
-    export_trigger_tag = plc_config.get('export_trigger_tag')
-    export_csv_path = plc_config.get('csv_path')
-    export_minutes = plc_config.get('export_minutes')
+    export_trigger_tag = plc_config.get("export_trigger_tag")
+    export_csv_path = plc_config.get("csv_path")
+    export_minutes = plc_config.get("export_minutes")
 
     last_trigger = "false"
 
@@ -86,10 +82,10 @@ def main():
     with open("config.json") as f:
         config = json.load(f)
 
-    setup_logging(config['logging'])
+    setup_logging(config["logging"])
 
     processes = []
-    for plc_config in config['plcs']:
+    for plc_config in config["plcs"]:
         p = multiprocessing.Process(target=plc_worker, args=(plc_config,))
         p.start()
         processes.append(p)
@@ -98,6 +94,6 @@ def main():
         p.join()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     multiprocessing.freeze_support()  # Windows-safe
     main()
